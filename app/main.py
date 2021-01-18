@@ -1,6 +1,6 @@
 from fastapi import FastAPI, File, UploadFile
 
-import crud
+from . import crud
 import shutil
 
 app = FastAPI()
