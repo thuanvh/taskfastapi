@@ -29,21 +29,26 @@ DBSession = sessionmaker(bind=engine)
 def create_task(db: DBSession, filepath: str):
     uid =  uuid.uuid4().hex
     task = models.Task(id = uid, filepath = filepath, status = 'created', completed=False)
-    history = models.History(id = uid, time = datetime.now(), task = task)
+
+    uid2 =  uuid.uuid4().hex
+    history = models.History(id = uid2, time = datetime.now(), task = task)
     db.add(task)
     db.commit()
     db.add(history)
     db.commit()
     return task
 
-def update_status(db: DBSession, task_id: str, task_status: str):
+def update_status(db: DBSession, task_id: str, task_status: str, task_result = None):
     task = db.query(models.Task).filter(models.Task.id == task_id).first()
-    task.status = status
+    task.status = task_status
     if task_status == "completed":
         task.completed = True
+    if task_result != None:
+        task.result = task_result
     db.commit()
 
-    history = models.History(id = uid, time = datetime(), task = task)
+    uid2 =  uuid.uuid4().hex
+    history = models.History(id = uid2, time = datetime.now(), task = task, status = task_status)
     db.add(history)
     db.commit()
 
@@ -53,3 +58,7 @@ def get_task(db: DBSession, task_id: str):
     
 def get_task_history(db: DBSession, userid: int):
    return db.query(models.History).filter(models.TODO.owner_id == userid).all()
+
+def get_next_task(db: DBSession):
+    task = db.query(models.Task).filter(models.Task.completed == False).first()
+    return task

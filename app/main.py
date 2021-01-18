@@ -3,9 +3,14 @@ from fastapi import FastAPI, File, UploadFile
 from . import crud
 import shutil
 
+from . import process
+import os
+
 app = FastAPI()
 
 session = crud.DBSession()
+
+process.start_process(session)
 
 @app.get("/")
 async def root():
@@ -18,6 +23,8 @@ async def read_task(task_id: str):
 
 @app.post("/uploadfile/")
 def create_task(uploaded_file: UploadFile = File(...)):
+    if not os.path.exists("files"):
+        os.makedirs("files")
     file_location = f"files/{uploaded_file.filename}"
     uploaded_file.file.seek(0)  # <-- This.
 

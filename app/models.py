@@ -1,5 +1,5 @@
 import os
-from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Boolean
+from sqlalchemy import Column, ForeignKey, Integer, String, DateTime, Boolean, Text
 from sqlalchemy import create_engine
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import relationship
@@ -14,6 +14,7 @@ class Task(Base):
     filepath = Column(String)
     status = Column(String)
     completed = Column(Boolean)
+    result = Column(Text)
     histories = relationship("History", back_populates="task", cascade="all, delete-orphan")
 
 class History(Base):
