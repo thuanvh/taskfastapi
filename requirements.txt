@@ -2,3 +2,8 @@ fastapi
 uvicorn
 sqlalchemy
 python-multipart
+scipy
+dlib
+imutils
+numpy
+opencv-python
