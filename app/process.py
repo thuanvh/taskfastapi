@@ -3,10 +3,11 @@ from . import crud
 import importlib.util
 import time
 import os
-from multiprocessing import Process
+#from multiprocessing import Process
 import site
 #from features import heartrate import run_video
 from .features.heartrate import NoGUI
+import queue
 
 def main_process(db):
     while True:

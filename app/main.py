@@ -3,14 +3,17 @@ from fastapi import FastAPI, File, UploadFile
 from . import crud
 import shutil
 
-from . import process
+from .process_thread import start_process, end_process
 import os
+import uuid
 
 app = FastAPI()
 
-session = crud.DBSession()
+db = crud.DBSession()
 
-process.start_process(session)
+@app.on_event("startup")
+async def startup_event():
+    start_process()
 
 @app.get("/")
 async def root():
@@ -18,22 +21,33 @@ async def root():
 
 @app.get("/tasks/{task_id}")
 async def read_task(task_id: str):
-    task = crud.get_task(session, task_id)
-    return {"status": task.status}
+    db = crud.DBSession()
+    task = crud.get_task(db, task_id)
+    return {"status": task.status, "result": task.result}
 
 @app.post("/uploadfile/")
 def create_task(uploaded_file: UploadFile = File(...)):
+    db = crud.DBSession()
     if not os.path.exists("files"):
         os.makedirs("files")
-    file_location = f"files/{uploaded_file.filename}"
+    ext_list = (uploaded_file.filename).split('.')
+
+    ext = ext_list[1] if len(ext_list) > 1 else ""
+    uid =  uuid.uuid4().hex
+    file_location = f"files/{uid}.{ext}"
     uploaded_file.file.seek(0)  # <-- This.
 
     with open(file_location, "wb+") as file_object:
         shutil.copyfileobj(uploaded_file.file, file_object)
-    task = crud.create_task(session, file_location)
+    task = crud.create_task(db, file_location)
     #return {"filename": file.filename, "content_type" : file.content_type}
     return {"taskid": task.id}
 
+@app.on_event("shutdown")
+def shutdown_event():
+    print("shutdown event")
+    end_process()
+    sys.exit()
 # import shutil
 # from pathlib import Path
 # from tempfile import NamedTemporaryFile

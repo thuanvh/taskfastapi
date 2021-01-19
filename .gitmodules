@@ -1,3 +1,3 @@
-[submodule "features/heartrate"]
-	path = features/heartrate
+[submodule "app/features/heartrate"]
+	path = app/features/heartrate
 	url = https://github.com/thuanvh/Heart-rate-measurement-using-camera
